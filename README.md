@@ -1,3 +1,5 @@
+This is my personal fork for the INDX configuration files and macros. These may or may not be compatible with your printer. YMMV.
+
 # INDX Wiki
 
 > The community knowledge base for the Bondtech INDX, an induction-based automatic tool changer for open-platform XY-head 3D printers.
