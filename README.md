@@ -2,7 +2,8 @@ This is my personal fork for the INDX configuration files and macros. These may 
 
 Much credit for some of these customizations goes to charliemayall and 3DPrintDemon who provided some of the macro adjustments and ideas that are implemented here.
 
-https://github.com/charliemayall/INDX/tree/main
+https://github.com/charliemayall/INDX/
+
 https://github.com/3DPrintDemon/DEMON_INDX
 
 Other modifications are my own.
