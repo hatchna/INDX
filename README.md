@@ -37,6 +37,7 @@ Other modifications are my own.
        - [Load cell probe](#load-cell-probe)
        - [Automated dock X measurement](#automated-dock-x-measurement-built-in)
        - [Homing override](#homing-order-important)
+         - [Seat check](#seat-check)
      - [RRF (RepRapFirmware)](#rrf-reprapfirmware)
    - [Initial Startup](#initial-startup)
 
@@ -49,7 +50,7 @@ Other modifications are my own.
    - [Tool Offsets](#tool-offsets)
      - [Method 1: Print and adjust](#method-1-print-and-adjust-free-no-extra-hardware)
      - [Method 2: Nudge](#method-2-nudge-automatic-requires-small-hardware)
-     - [Method 3: Nozzle camera + CAL_01/02/03](#method-3-nozzle-camera-most-precise-xy-higher-cost)
+     - [Method 3: Nozzle camera + CAL_ONE/TWO/THREE](#method-3-nozzle-camera-most-precise-xy-higher-cost)
      - [Z offset: CAL_Z](#z-offset-calibration)
    - [Temperature & Induction Settings](#temperature--induction-settings)
    - [Speed & Acceleration](#speed--acceleration)
@@ -176,7 +177,7 @@ Select the accessories that match your printer when ordering:
 | Accessory | Options | Notes |
 | --------- | ------- | ----- |
 | **Bondtech INDX Link Cable** | Choose length | XT30 2+2 cable (24V, GND, CAN+, CAN−) with a shield connected to GND on the Link Board, from the Link Board to the Smart Head. Red/black wires carry power, yellow/white carry CAN H/L. Choose the length that fits your wiring run. See note below. |
-| **Tool Dock** | Pre-made SLS hardware or STL/STEP files | Bondtech sells ready-made docks for common Makerbeam/1515 extrusion. Or download the files and print your own. |
+| **Tool Dock** | Pre-made SLS hardware or STL/STEP files | Bondtech's ready-made docks are designed for MakerBeam XL 15×15. Or download the files and print your own; the standard 1515 body suits both profiles. |
 | **X-Carriage adapter** | MGN12H option for 6mm belts, or download files | Required to mount the Smart Head to your carriage. Available for common CoreXY standards; check the shop or download from GitHub. |
 
 > **What is CAN bus?** CAN bus is a communication standard that lets multiple devices share a single cable. You don't need to understand the protocol in depth; the Link Board handles it for you. In practice it means the Smart Head connects to the Link Board via just one 4-wire cable (carrying both power and data) instead of the bundle of wires a conventional toolhead needs. CAN is currently only supported on RRF; USB is used for Klipper/Kalico.
@@ -198,28 +199,30 @@ Prusa Research has built an official first-party integration for their CoreXY pr
 | Prusa CORE One | Available | Sold by Prusa Research. Plug-and-play. Supports up to 8 tools. See [prusa3d.com](https://www.prusa3d.com/applications/prusa-3d-printers-with-bondtech-indx_243519/) for details. |
 | Prusa CORE One L | Coming later | First-party Prusa integration, availability timeline TBD. Supports up to 8 tools. |
 
-### Officially supported integrations
+### Officially recognized integrations
 
-Beyond the first-party Prusa integration, Bondtech officially supports a small set of community-built integrations for specific printers. Each comes with ready-to-print parts and the installation files needed to mount INDX on that machine. Download them from the links below.
+Beyond the first-party Prusa integration, a few community-built integrations are solid enough that Bondtech points people at them by name. Each comes with ready-to-print parts and the installation files needed to mount INDX on that machine.
+
+They are not Bondtech products. They are hosted externally and maintained by their designers, so questions about the parts themselves belong with them rather than in this repository. Recognized here means we rate the work, not that we support it.
 
 | Printer | Designer | Files |
 | ------- | -------- | ----- |
 | Sovol SV08 OG & SV08 Max | 3DPrintDemon | [Printables](https://www.printables.com/model/1771164-official-indx-sovol-sv08-og-sv08-max-integrations) |
 | Voron Trident R2 | Steve — Voron team, designer of the Trident | [Printables](https://www.printables.com/model/1761163-trident-r2-bondtech-indx-mods) |
 
-### Community integrations
+### Unverified community builds
 
-INDX runs on a wide range of CoreXY printers, far more than Bondtech could ever test and support directly. What makes that possible is community members who've done the integration work on their own printer and shared what they learned. Every config in the repo started with someone doing it for the first time.
+INDX runs on a wide range of CoreXY printers, far more than Bondtech could ever test and support directly. What makes that possible is community members who've done the integration work on their own printer and shared what they learned. The printers below are known to work; what varies is whether anyone has published parts for them yet.
 
-> **What does "community" status mean?** The hardware works on that printer, but the integration guide comes from the community, not Bondtech. Some printers already have complete, verified configs on GitHub; check the repo first. Others are earlier stage. The [Bondtech Discord](https://discord.gg/XDX9jDXN6e) has channels for specific printers, which is a good place to find others running the same platform and see how far along the integration is.
+> ⚠️ **Nothing in this table has been checked by Bondtech.** We have not printed these parts, measured them, or run them on a machine here. Listing a build is not an endorsement and says nothing about whether the geometry is right. Read them the way you would read any stranger's remix: check a dock against [Dock Design](#dock-design) before printing it, since dock geometry that misses those constraints gives unreliable tool changes rather than an obvious failure. Questions about these parts belong with whoever made them, not with Bondtech.
 
-| Printer | Status | Notes |
-| ------- | ------ | ----- |
-| Voron 2.4 | Community | |
-| Voron Trident | Community | Trident R2 has an [officially supported integration](#officially-supported-integrations) |
-| RatRig V-Core | Community | |
-| Sovol | Community | SV08 OG / SV08 Max have an [officially supported integration](#officially-supported-integrations) |
-| Custom CoreXY | Community | Any CoreXY with open firmware; see [Requirements](#requirements--preparation) |
+| Printer | Build | Source |
+| ------- | ----- | ------ |
+| Voron 2.4 | Full conversion parts set: X-carriage, tool holder, XY joint, front idlers, Z bearing block with Y endstop, Z chain mount | [karasgit/INDX-for-Voron-2.4](https://github.com/karasgit/INDX-for-Voron-2.4), with a [walkthrough video](https://www.youtube.com/watch?v=topIOL-b3Gw) by Emplikac 000 |
+| RatRig V-Core | None published yet | — |
+| Custom CoreXY | None, and none expected: mounting is specific to your machine | Any CoreXY with open firmware works; see [Requirements](#requirements--preparation) |
+
+The [Bondtech Discord](https://discord.gg/XDX9jDXN6e) has channels for specific printers, which is the best place to find someone running the same platform and ask how far along they got.
 
 **Your printer isn't listed?** If you've got INDX running on it, that integration belongs here. Submit a pull request on [github.com/BondtechAB/INDX](https://github.com/BondtechAB/INDX) and you'll save the next person hours of work. See [Contributing a printer integration](#contributing-a-printer-integration) for what to include.
 
@@ -559,10 +562,10 @@ The Smart Head replaces your printer's existing toolhead entirely. It mounts to 
 | Source             | Material                | Notes                                                                                                                      |
 | ------------------ | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Bondtech (shop)    | SLS-printed Nylon 12 GF | Common MGN12 carriage options available to purchase                                                                    |
-| GitHub / community | User-printed            | STL/STEP files on [github.com/BondtechAB/INDX](https://github.com/BondtechAB/INDX); print your own for less common setups |
+| GitHub / community | User-printed            | Printable MGN12H adapter (6mm belts) in the repo; use the reference STEP to adapt one for other carriages |
 
 
-If your carriage configuration isn't covered by Bondtech's sold options, check the GitHub repo for a community-contributed adapter or print your own from the provided files. A printable MGN12H adapter (6mm belts) is available in [CAD Files & Templates](#cad-files--templates). Community-made X-carriage designs that meet quality standards will be included in the official repo. If you're designing your own, see [CAD Files & Templates](#cad-files--templates) for the reference geometry files.
+If your carriage configuration isn't covered by Bondtech's sold options, the repository has a printable MGN12H adapter for 6mm belts in [CAD Files & Templates](#cad-files--templates). For anything else, the reference STEP in the same section carries the mounting geometry to design against, and the [officially recognized integrations](#officially-recognized-integrations) above cover some specific printers. Community-made X-carriage designs that meet quality standards are welcome in the repo via pull request.
 
 > **Before you start:** Remove your existing hotend, part cooling fan, and any toolhead PCB or wiring mounted on the carriage. The Smart Head replaces all of this.
 
@@ -618,7 +621,11 @@ The dock can be positioned anywhere within the gantry's travel range, but the Sm
 
 The dock must be mounted to a rigid bar or frame element; the dock hardware alone cannot be free-standing. Most CoreXY printers have an extrusion or crossbar that works for this. If your printer does not have a suitable mounting point, you will need to add one before proceeding.
 
-The Bondtech-sold dock hardware is designed to mount on **15×15 aluminium extrusion**. If you are printing your own dock from the GitHub files, design your mounting to suit your frame.
+The dock hardware Bondtech sells is designed for **MakerBeam XL 15×15**.
+
+> 💡 **A note on fasteners.** MakerBeam XL has an indexing track running down the slot, so despite both profiles being 15×15 the two do not take a fastener quite the same way. The MakerBeam XL body still mounts fine on standard 1515 extrusion, so a ready-made dock or an already-printed MakerBeam XL body is not wasted if that is your frame. Standard T-nuts are the fiddly part: expect to shave a little material off one to clear the track. A printed M3 nut carrier for 1515 is the easier route if you have that body already.
+
+If you are printing your own, the repository has two dock bodies. The **standard 1515** one suits both profiles, which makes it the easier all-round choice. See [CAD Files & Templates](#cad-files--templates). For any other frame, design your mounting to suit it.
 
 > ⚠️ **Critical:** The dock has strict positioning requirements that must be met for reliable tool changes. Incorrect placement will cause failed pickups. See the critical requirements below before mounting.
 
@@ -627,11 +634,11 @@ The Bondtech-sold dock hardware is designed to mount on **15×15 aluminium extru
 
 | Source          | Type                                 | Mounting                                     |
 | --------------- | ------------------------------------ | -------------------------------------------- |
-| Bondtech (shop) | SLS-printed Nylon 12 GF              | Common options for 15×15 aluminium extrusion |
+| Bondtech (shop) | SLS-printed Nylon 12 GF              | Designed for MakerBeam XL 15×15              |
 | GitHub          | Reference design + community designs | Print yourself, or adapt for your frame      |
 
 
-Community-contributed dock designs will be added to [github.com/BondtechAB/INDX](https://github.com/BondtechAB/INDX) as they are developed. If you design a dock for an unlisted printer or frame, consider submitting it. See [Dock Design](#dock-design) for geometry constraints and design requirements before you start.
+Community-contributed dock designs live in [`community/`](community/) in the repository. There is a [2020 extrusion dock](community/1_printer_agnostic/2020-dock/) there already if your frame is 2020 rather than 15×15, along with a [magnet jig](community/1_printer_agnostic/magnet-jig/) that makes dock assembly considerably less painful. If you design a dock for an unlisted printer or frame, consider submitting it. See [Dock Design](#dock-design) for geometry constraints and design requirements before you start.
 
 **Critical dock positioning requirements**
 
@@ -702,7 +709,7 @@ Flashing is done over SSH from your computer into the Raspberry Pi (or other hos
 
 **What you need**
 
-- **PuTTY**: a free SSH client for Windows. Download it from [putty.org](https://www.putty.org/).
+- **PuTTY**: a free SSH client for Windows. Download it from [its official site at chiark.greenend.org.uk](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html), Simon Tatham's own page. `putty.org` is not affiliated with the project.
 - Your printer's **IP address**: find this in your router's device list, or check the display on your host if it shows one. You can also use the hostname (e.g. `mainsailos.local` or `fluidd.local`) if your network supports it.
 
 ###### Connect to your printer via SSH
@@ -810,6 +817,7 @@ pid_b: 1.0
 sensor_type: indx  # Custom sensor type provided by the INDX plugin — reads temperature via the IR sensor on the induction board
 min_temp: 0
 max_temp: 350
+smooth_time: 0.3  # Reduce display and wait-condition lag during rapid induction heat-up
 
 heater_pin: indx:heater
 # Induction heating uses watermark (on/off bang-bang) control, not PID.
@@ -858,6 +866,13 @@ cs_pin: indxmcu:encoder_cs
 spi_bus: sercom1
 ```
 
+The INDX MCU reports nozzle temperature every 0.1 seconds. Klipper's default
+one-second heater smoothing can nevertheless lag substantially behind the
+measured temperature during the very fast induction heat-up, delaying the
+displayed temperature and temperature-wait completion. Keep `smooth_time: 0.3`
+in the extruder configuration to reduce that lag while retaining smoothing
+across multiple reports.
+
 > ⚠️ **Do not change `rotation_distance`**
 >
 > The `rotation_distance: 5.7` value is pre-calibrated for the DX extruder and is used by the INDX tool-change macros to calculate precise filament moves during tool changes. Changing it, even slightly, will cause incorrect filament positioning and failed tool changes. Do not treat it as a value to tune. If your extrusion multiplier needs adjusting, do it in the slicer, not here.
@@ -876,6 +891,8 @@ Copy the path that starts with `usb-Bondtech_INDX` and paste it into your config
 
 The `[extruder]` block above is always required and represents the Smart Head's single DX extruder. INDX passive tools are **not** separate Klipper extruders — there is only ever one `[extruder]`. Additional tools (T1, T2, …) are defined in `indx.cfg`: set `variable_tool_count` and add a `variable_t{n}_x` / `variable_t{n}_dock_y` pair per tool in the `[gcode_macro TOOL_POSITIONS]` section (see [INDX macro files](#indx-macro-files)). Per-tool XY/Z offsets come from [Tool Offsets](#tool-offsets) calibration, and per-tool nozzle sizes and temperatures are set in your slicer.
 
+**Tools that do not print.** A dock position does not have to hold a hotend. If you are carrying a pen, a cutter, a camera or anything else with nothing to heat, list its tool number in `variable_no_heat_tools` in `indx.cfg`, for example `variable_no_heat_tools: [3]`. The pickup, latch and park moves already run cold, so the only thing that changes is that the induction coil is never switched on for that tool. Setting it here rather than in the slicer matters: your change filament G-code is a single template shared by every tool, so it will pass a temperature for the pen along with everything else, and this makes the printer ignore it. The tool still needs a dock position and still counts toward `variable_tool_count`.
+
 ##### INDX macro files
 
 The INDX firmware plugin provides a set of `.cfg` files you include from `printer.cfg`. Each file has a specific role:
@@ -885,6 +902,7 @@ The INDX firmware plugin provides a set of `.cfg` files you include from `printe
 | `indx.cfg` | User configuration: tool positions and related settings. **The only file you need to edit.** |
 | `indx-tc-macros.cfg` | Tool change logic: `CHANGE_TOOL`, `PARK_TOOL`, boot detection. Do not edit. |
 | `indx-cal.cfg` | Calibration macros: dock position, XY/Z offset calibration. |
+| `homing.cfg` | `[homing_override]`: Y then X, load-cell seat check, then Z. Do not edit. |
 
 Include them from your `printer.cfg`:
 
@@ -892,7 +910,10 @@ Include them from your `printer.cfg`:
 [include indx/indx.cfg]
 [include indx/indx-tc-macros.cfg]
 [include indx/indx-cal.cfg]
+[include indx/homing.cfg]
 ```
+
+Klipper allows only one `[homing_override]`. If your printer already has one (sensorless current, bed raiser, etc.), merge the INDX sequence into yours instead of including `homing.cfg` as-is.
 
 ##### Required Klipper sections
 
@@ -963,6 +984,75 @@ prefixed_probe_commands: true
 
 For Cartographer, add only the first line to `[cartographer]` — it will reject `prefixed_probe_commands`.
 
+##### Eddy current scanner (optional)
+
+The INDX toolboard has the LDC1612 sensor chip on board. With the INDX Eddy Current Scanner coil connected (a separate product), it scans bed meshes; Z homing stays on the load cell, and the scanner only supplies the shape of the bed, never its height.
+
+It needs Kalico from 2026-10-08 or later: if you have not updated Kalico since then, update it first (Mainsail or Fluidd, Update Manager). Mainline Klipper does not support it yet.
+
+```ini
+[probe_eddy_current scanner]
+sensor_type: ldc1612
+i2c_mcu: indxmcu
+i2c_bus: sercom3
+intb_pin: indxmcu:ldc_int
+# The toolboard clocks the LDC1612 from its 25 MHz crystal
+frequency: 25000000
+# Scanner position relative to the nozzle (Smart Head CAD)
+x_offset: 0
+y_offset: 34.472
+z_offset: 1.0
+# The load cell stays the default probe; the scanner is selected with PROBE=scanner
+register_as_probe: False
+# The INDX coil trips the LDC1612 amplitude-low error in normal use
+amplitude_errors: high
+
+# Scanner coil temperature, for monitoring
+[temperature_sensor scanner_coil]
+sensor_type: indx
+indx_sensor: ldc_coil
+```
+
+Calibrate it once, with T0 on the head, the nozzles cold and the printer homed (`G28`):
+
+1. `LDC_CALIBRATE_DRIVE_CURRENT CHIP=scanner`, then `SAVE_CONFIG`.
+2. `G28` again, then `PROBE_EDDY_CURRENT_CALIBRATE CHIP=scanner`. Bring the nozzle down until it just touches the bed (the manual probe prompt), accept, and `SAVE_CONFIG`.
+
+Redo both after moving or replacing the scanner or the Smart Head mount.
+
+Scan a mesh with:
+
+```
+BED_MESH_CALIBRATE PROBE=scanner METHOD=rapid_scan
+```
+
+Without `PROBE=` the mesh is probed with the load cell, one touch per point. Without `METHOD=rapid_scan` the scanner stops at every point, which takes much longer. `ADAPTIVE=1` scans only the area of the print, and `SCAN_SPEED=` sets the scan speed (default the `[bed_mesh]` `speed`).
+
+In `[bed_mesh]`:
+
+- `horizontal_move_z` must be above the scanner `z_offset` (for example 2), or every scanner probe starts already triggered.
+- Mesh coordinates are scanner positions, and the nozzle is 34.5 mm further toward the front. Pick `mesh_min` Y so the nozzle stays at or behind `clearance_y` (with `clearance_y: 0`, `mesh_min` Y 35 or more). The strip in front of that is extrapolated from the front row.
+- Set `zero_reference_position` to the G28 Z probe point (`probe_x`, `probe_y` in `indx.cfg`, or the bed centre). The mesh is then zeroed where the load cell set Z0, so the scanner only supplies the bed shape and its overall height drift cancels out.
+- The coil is about 17.6 mm across. A mesh spacing near that size already resolves what the scanner can see.
+
+Good practice:
+
+- **Mesh with the nozzles cold.** The induction heater disturbs the scanner, and a nozzle that has just primed warms the coil and shifts its reading. In your print start, mesh before heating the nozzles.
+- **Level with the load cell, not the scanner.** Use the default probe for `QUAD_GANTRY_LEVEL` and `Z_TILT_ADJUST`; the scanner sits 34.5 mm behind the nozzle and reads gantry tilt slightly differently.
+- If a wrapper macro (KAMP or your own `PRINT_START`) calls `BED_MESH_CALIBRATE`, make it pass `PROBE=scanner METHOD=rapid_scan`. A wrapper that drops them can be bypassed by calling `_BED_MESH_CALIBRATE`, the built-in command it renamed.
+- To check the result, tap a few spots with the load cell (`PROBE`) and compare with the mesh.
+
+Clearance: the scanner PCB sits 2.56 mm above the nozzle tip, but its mounting screw heads are only about 0.89 mm above it, about 51 mm behind the nozzle. They catch anything more than about 0.9 mm above the current layer: curled overhangs, warped corners, blobs.
+
+| What you see | What to do |
+|---|---|
+| Klipper will not start: more than one probe registers itself | `register_as_probe: False` in `[probe_eddy_current scanner]` |
+| "Sensor readout error" during a scan | `amplitude_errors: high` |
+| "horizontal_move_z can't be less than probe's z_offset" | raise `horizontal_move_z` in `[bed_mesh]` |
+| "Sample rate is not high enough for the requested speed" | lower `SCAN_SPEED=` to the speed the message names, or below |
+| "METHOD=rapid_scan not supported ... using automatic" | update Kalico, or check that `PROBE=` names the scanner |
+| The mesh is probed by touching the bed | `PROBE=scanner` did not reach `BED_MESH_CALIBRATE`: check your print start or wrapper |
+
 ##### Automated dock X measurement (built in)
 
 Automated dock X measurement is **built into the INDX plugin** — there is no separate Python extra to install. The plugin registers `INDX_DOCK_MEASURE`, which energises the XY motors, homes Y then X from the dock, and derives the absolute dock position from the raw stepper counts (so it works for each tool in turn without a prior `G28`).
@@ -978,30 +1068,64 @@ The `indx-cal.cfg` macros wrap this into the calibration commands you actually r
 
 ##### Homing order (important)
 
-With a dock mounted on your printer, the default homing sequence can cause crashes. The Smart Head must move away from the dock before X is homed, and if a tool other than T0 is currently mounted it must be parked before Z is homed.
+With a dock mounted on your printer, the default homing sequence can cause crashes. The Smart Head must move away from the dock before X is homed, and Z homing needs a seated tool (the load cell is the nozzle probe).
 
 The INDX macro package includes a ready-to-use `[homing_override]` in `homing.cfg` that handles all of this. Its sequence, in full:
 
-1. Move Z up slightly to clear the bed before any XY movement (move bed down if using a bed raiser)
-2. Home Y (with reduced TMC current for sensorless homing)
-3. Home X (with reduced TMC current for sensorless homing)
-4. If any tool other than T0 is active: park it in the dock
-5. If T0 is not already picked up: pick up T0
-6. Move to bed centre and home Z
+1. Raise to `probe_z_clearance` (set in `indx.cfg`). If Z is unknown, hop that height then un-home Z so the later probe is a real home.
+2. Home Y. `G28 X` with Y unknown homes Y first.
+3. Home X at a Y that clears the docks. Homing X crosses every dock position. If the head's Y (the Y endstop after a fresh Y home, or the current Y if Y was already homed) is on the dock side of `clearance_y`, it moves to `clearance_y` first; if it is already on the far side, for example a Y endstop opposite the docks, X homes where it stands. An unknown Y always moves. `dock_dir` in `indx.cfg` decides which side the docks are on.
+4. Make T0 the tool on the head. `G28 Z` always homes on T0, because the per-tool Z offsets are stored as differences from T0. With T0 locked there is no dock trip; another tool is parked and T0 fetched; an empty head fetches T0, also when Z has never been homed (step 1 already lifted the gantry clear of the bed). Until the docks are measured (`docks_calibrated: False`), G28 refuses that trip: seat T0 by hand with `MANUAL_TOOL_SEAT TOOL=0` first. `home_check_seat` in `indx.cfg` decides how INDX knows what is on the head: `False` (default) trusts `active_tool`, `True` also requires the load cell to agree. See [Seat check](#seat-check) for what turning it on buys and costs.
+5. Move to the probe XY (`probe_x` / `probe_y`, or bed centre), home Z, then lift back to `probe_z_clearance`. `G28 Z` ends at the trigger point a fraction of a millimetre off the bed, so the lift leaves the head at a height any following move can start from.
 
-T0 is always the reference tool for Z homing. This ensures Z is always probed with the same tool, keeping Z offsets for all other tools consistent.
+`CAL_Z` stores per-tool Z offsets relative to T0, which is why Z always homes on T0.
+
+#### Seat check
+
+Z homing probes with the nozzle, so it needs a tool on the head. The load cell can be asked to confirm one is there before every `G28 Z`, by setting `home_check_seat: True` in `indx.cfg`. It is off by default, and that default is deliberate.
+
+The load cell is a dependable contact detector and an undependable scale. Probing only asks it *when* force changed, which it answers well. The seat check asks it *how many grams are on the head right now*, and that number moves with the tare. A head tared with a tool already in it reads near zero with that tool still seated, and the check then refuses a homing that would have been perfectly safe.
+
+With the check off, `active_tool` answers instead. That is the same value every tool change already trusts, so the seat check is not the weak link if it is wrong. What you give up is the one place that could have caught it being wrong.
+
+With the check on, the cell and `active_tool` must agree. Either can be wrong on its own, so a disagreement in either direction stops the machine and asks rather than picking a winner: a cell that reads empty while `active_tool` names a tool would otherwise send a loaded head into another dock. T0 is fetched only when both say the head is empty. Tune the threshold with `home_min_force_g` (default 800 g), and note that a missing or uncalibrated `[load_cell_probe]` becomes a homing error rather than just a probing one.
+
+`INDX STATUS` prints the live reading on its `SEAT FORCE` line whichever way this is set, so you can see what the cell thinks without having it gate anything. If it reads near zero with a tool seated, the tare has drifted: run `CALIBRATE_LOAD_CELL` with an empty head.
+
+If you use sensorless XY homing, wrap the `G28 Y` / `G28 X` steps in your usual TMC current reduce/restore (merge into the override if you already have one).
 
 **Review your `PRINT_START` macro**
 
 If you are migrating from a single-toolhead printer, your existing `PRINT_START` macro almost certainly heats the hotend before printing starts, something like `M104 S{first_layer_temperature}` or `M109 S{first_layer_temperature}`. With INDX, this will cause problems: there is no hotend to heat until a tool has been picked up by the Smart Head.
 
-> ⚠️ Any hotend heating commands in your `PRINT_START` macro must come **after** the first tool pick-up (`T0`). Sending a heat command before a tool is picked up will result in an error, and depending on your macro structure, may cause a crash or leave the printer in a bad state.
+> ⚠️ Any hotend heating commands in your `PRINT_START` macro must come **after** the first tool pick-up. Sending a heat command before a tool is picked up will result in an error, and depending on your macro structure, may cause a crash or leave the printer in a bad state.
 
-Review your `PRINT_START` macro and move all `M104`/`M109` (and any temperature wait commands) to after the first `T0` call. If you are writing a fresh macro, pick up a tool first, then heat.
+Review your `PRINT_START` macro and move all `M104`/`M109` (and any temperature wait commands) to after the first tool pick (`Tn` / `CHANGE_TOOL`). If you are writing a fresh macro, pick up a tool first, then heat.
+
+INDX's own `M104` and `M109` (in `indx-tc-macros.cfg`) enforce this: with no tool on the head they don't heat and say so in the console, a tool listed in `no_heat_tools` is never heated, and `M104 T<n>` / `M109 T<n>` for a tool that is not on the head is ignored instead of stopping the print (slicers send these for parked tools). If your config defines its own `M104` or `M109`, only the last one loaded is used, so merge these rules into yours.
+
+**Display alerts**
+
+Warnings that are dangerous to ignore (`! ...`, for example a failed homing or `clearance_y` too close to a dock) and moments when you need to act (`> ...`, for example docks not calibrated yet) are also shown with `M117` on the printer display. The console keeps the full message. An INDX alert clears itself after the next successful `G28`, and never clears your own `M117` text.
+
+#### Pickup and park checks
+
+INDX checks every pickup and every park with the load cell. This is on by default (`seat_check_enabled: True` in `indx.cfg`) and is separate from the homing [seat check](#seat-check) above. Each check compares two readings taken standing still a few seconds apart, so the tare and the load cell's drift with temperature do not affect it.
+
+- **Pickup.** The head reads the load cell at the trigger line with the head empty, picks up the tool, and reads it again. A seated tool adds its latch spring preload, so the two readings must differ by at least `seat_min_force_g` (default 680 g). If they don't and the difference is below `seat_empty_max_g` (default 230 g), the head is empty: the console says so, X and Y are homed again, and the tool is parked and picked up once more. In sport mode INDX first switches to normal tool change speed, says so on the console and the display, and stays in normal (also after a restart) until you run `MODE_SPORT` again. If the second try fails too, the heater is turned off and no tool is recorded. A difference between `seat_empty_max_g` and `seat_min_force_g` means the tool may be half seated on the head. INDX never assumes the head is empty, so there is no retry: the heater is turned off, the tool stays recorded as on the head, the latch is left as it is, and the display shows `T<n> may be on the head`. Until the head has been checked, `G28` (when it homes Z), `CHANGE_TOOL` and `PARK_TOOL` refuse to run, also after a restart. Check the head by hand, then run `MANUAL_TOOL_REMOVE` (take the tool off and put it in its dock) or `MANUAL_TOOL_SEAT TOOL=<n>` (it is fully on). Either one, or `MANUAL_TOOLHEAD_RESET`, clears the refusal. Either way, during a print the print pauses, with nothing moved or retracted: get the tool back in its dock with the head empty, run the `CHANGE_TOOL` command the console gives you, then `RESUME`. Outside a print, and during the T0 fetch of a `G28`, INDX stops with an error.
+- **Park.** The head reads the load cell with the tool still seated, parks it, and reads it again after leaving the dock. The readings must differ by at least `park_min_change_g` (default 425 g). If they don't, the tool is probably still on the head: INDX stops with an error before driving anywhere else, turns the heater off, and keeps the tool recorded as on the head. Check the head. If the heater also reported a model divergence, a blob from a detached print may be stuck on the nozzle.
+
+Successful pickups print the reading in the console, for example `T1 seated: load cell -1650 g against the empty head`, which is useful when tuning `seat_min_force_g`. A failed check also shows a short alert on the printer display.
+
+Without a calibrated load cell the checks are skipped, with one line in the console after each restart. To turn them off, set `variable_seat_check_enabled: False` in `indx.cfg`. Tool changes then work as they did before the checks existed. If you keep your own `indx.cfg`, the checks are on with the defaults above until you add these settings.
 
 #### RRF (RepRapFirmware)
 
 Configure the Bondtech INDX PCB in RRF following the [Duet INDX Toolboard documentation](https://docs.duet3d.com/en/Duet3D_hardware/Duet_3_family/INDX_Toolboard).
+
+The RRF tool-change and calibration macros are in [`macros/RRF/`](macros/RRF/) in this repository. They are the RRF counterpart to the Klipper `.cfg` files described above, covering tool changes (`tpreN.g`, `tpostN.g`, `tfreeN.g` for each tool, calling `INDX_TC_PRE.g`, `INDX_TC_POST.g`, `INDX_TC_FREE.g`, with `INDX_UNLOCK_DANCE.g` releasing a docked tool and `INDX_TC_REPORT.g` logging each check), the latch (`INDX_OPEN.g`, `INDX_CLOSE.g`, `INDX_CLOSE_CAL.g`, `INDX_LATCH_ENGAGE.g`, `INDX_LATCH_MOVE.g`), load-cell calibration, taring and readings (`INDX_LC_CALIBRATE.g`, `INDX_LC_CAL.g`, `INDX_LC_RETARE.g`, `INDX_TARE.g`, `INDX_LC_RAW.g`, `INDX_LC_SPEED_SWEEP.g`), the check that a tool is on before the nozzle probes (`INDX_TOOL_CHECK.g`), state persistence (`INDX_WRITE_STATE.g`), Z homing, bed levelling and meshing against the load cell (`homez.g`, `bed.g`, `mesh.g`), and pause, stop and power-loss resume (`pause.g`, `stop.g`, `resurrect-prologue.g`). `INDX_TC_TEST.g` is a test macro that cycles every tool and checks each drop-off and pickup; it goes in `0:/macros`.
+
+Settings live in [`INDX_variables.g`](macros/RRF/INDX_variables.g), which is the RRF equivalent of `indx.cfg` and the file to edit. Call it from `config.g` with `M98 P"INDX_variables.g"` **after** the hardware configuration, including after the `M558`/`G31` that create the load-cell probe.
 
 ### Initial Startup
 
@@ -1196,7 +1320,11 @@ Start with **no tool on the Smart Head** and run:
 CALIBRATE_LOAD_CELL
 ```
 
-This homes X and Y, opens the latch (and records soft-state Open), and tares the empty head. Now **seat a passive tool on the Smart Head by hand** — the tool **must be empty** (no filament in the extruder gears) — then calibrate against the known locking force (default 1600 g). `CALIBRATE_LOAD_CELL_APPLY` locks, samples, then unlocks again so you can remove the tool by hand.
+This homes X and Y, opens the latch (and records soft-state Open), and tares the empty head. X and Y are not homed again if they already are, and an open latch is not opened again.
+
+`CALIBRATE_LOAD_CELL` refuses to run when `active_tool` says a tool is on the head, or when an earlier calibration exists and the load cell reads a seated tool. Run `MANUAL_TOOL_REMOVE` and lift the tool off, or put it in its dock, then run it again. On a first calibration there is nothing to read against, so make sure the head is empty yourself.
+
+Now **seat a passive tool on the Smart Head by hand** — the tool **must be empty** (no filament in the extruder gears) — then calibrate against the known locking force (default 1600 g). `CALIBRATE_LOAD_CELL_APPLY` locks, samples, then unlocks again so you can remove the tool by hand.
 
 ```gcode
 CALIBRATE_LOAD_CELL_APPLY GRAMS=1600
@@ -1205,7 +1333,7 @@ SAVE_CONFIG
 
 Prefer the console? Run `LOAD_CELL_CALIBRATE`, then `TARE` with no tool, seat an **empty** tool and lock the latch, then `CALIBRATE GRAMS=1600`, `ACCEPT`, unlock the latch, and `SAVE_CONFIG`.
 
-Restart, then home the printer (`G28`) — Z now probes with the load cell.
+Restart. Then put T0 on the head by hand and run `MANUAL_TOOL_SEAT TOOL=0` before you home with `G28`. Until the dock positions are calibrated (`docks_calibrated: False` in `indx.cfg`), G28 will not fetch T0 from its dock, because the dock positions in a new `indx.cfg` are placeholders. Z now probes with the load cell.
 
 ### Dock Position Calibration
 
@@ -1223,6 +1351,8 @@ The trigger line (`dock_y - dock_dir * trigger_offset`) is derived automatically
 
 For a rear dock, set `variable_dock_dir: 1` and put `clearance_y` on the bed side of the tools.
 
+`clearance_y` must be at least 26 mm from the most protruding dock, on the side away from the docks (a tool on the head needs 25 mm, plus 1 mm margin). With front docks that means the highest `t{n}_dock_y` + 26 or more; the default 0.0 fits the default docks at -26. G28, `CHANGE_TOOL` and `PARK_TOOL` refuse to run otherwise and name the dock. Check it again after re-measuring a dock.
+
 > ⚠️ **Take this slow.** Moving the Smart Head into the dock area without verified coordinates is one of the most crash-prone steps in the entire INDX setup. A misaligned approach at speed can damage the Smart Head, the passive tools, or the dock itself.
 >
 > - **Always use the smallest jog increments available** (0.1 mm or less) when approaching a tool
@@ -1234,7 +1364,7 @@ For a rear dock, set `variable_dock_dir: 1` and put `clearance_y` on the bed sid
 
 #### Finding dock_y (Y: fully seated position)
 
-With the Smart Head holding the tool, carefully jog in Y in small increments until the tool is fully seated in the dock. When it feels fully engaged, run:
+Put the tool on the Smart Head by hand and run `MANUAL_TOOL_SEAT TOOL=n` (tool changes are refused until `docks_calibrated` is True). With the Smart Head holding the tool, carefully jog in Y in small increments until the tool is fully seated in the dock. When it feels fully engaged, run:
 
 ```gcode
 CAL_SET_DOCK_Y
@@ -1269,7 +1399,7 @@ Measures the absolute X position without needing a prior home, using the plugin'
    variable_t0_x: 0.000   # from CALIBRATE_DOCK_X output
    ```
 4. For each additional tool: `M84`, slide to the dock, run `CALIBRATE_DOCK_X TOOL=N`. No `FIRMWARE_RESTART` needed between tools.
-5. Once all tools are recorded, `RESTART` to apply, then `G28` to restore normal machine coordinates.
+5. Once all tools are recorded, `RESTART` to apply, then `G28` to restore normal machine coordinates. If `docks_calibrated` is still False, seat T0 by hand (`MANUAL_TOOL_SEAT TOOL=0`) before this `G28`, or set `docks_calibrated: True` first if every dock is now measured.
 
 **Option B: `READ_DOCK_POSITION` (if already homed)**
 
@@ -1290,6 +1420,8 @@ Home the printer, jog the Smart Head to the dock X for each tool, and note the X
 #### First tool change test
 
 Once you have calibrated the dock position for at least one tool, do a controlled first pick-up to confirm it works before setting up the full multi-tool configuration.
+
+First set `variable_docks_calibrated: True` in `indx.cfg` and `RESTART`. Until then INDX refuses tool changes and parking, so a dock position that was never measured can't be driven into.
 
 > ⚠️ **Take this slow.** Use the smallest jog increments and keep your hand near the emergency stop throughout. If anything looks wrong, stop immediately.
 
@@ -1313,6 +1445,8 @@ If the pick-up or deposit fails, do not retry at speed. Go back to the dock posi
 ### Tool Offsets
 
 Each passive tool has a slightly different position relative to the Smart Head pickup point. Tool offsets must be calibrated so prints align correctly when switching tools. There are several ways to do this, ranging from free manual methods to precise hardware-assisted ones.
+
+To start over, `RESET_TOOL_OFFSETS` zeroes the X/Y/Z offset of every tool. It prints the old values first, so you can copy them back from the console if needed. The global Z offset is left alone (`RESET_GLOBAL_Z` handles that).
 
 ---
 
@@ -1342,23 +1476,23 @@ Nudge is highly repeatable, typically below 0.003mm standard deviation over 10 s
 
 A nozzle-mounted or fixed camera system (e.g. [Axiscope](https://github.com/nic335/Axiscope)) lets you visually align tools with sub-micron precision. Offsets are derived from image analysis rather than physical contact.
 
-The INDX macro package includes a built-in camera calibration workflow (`CAL_01` → `CAL_02` → `CAL_03`) that automates the offset calculation once a camera is set up.
+The INDX macro package includes a built-in camera calibration workflow (`CAL_ONE` → `CAL_TWO` → `CAL_THREE`) that automates the offset calculation once a camera is set up.
 
 **Workflow:**
 
 1. Pick up T0 and jog the nozzle tip to the centre of your camera crosshair. Run:
    ```gcode
-   CAL_01_SET_CAMERA_REF
+   CAL_ONE_SET_CAMERA_REF
    ```
    This saves the current position as the reference point.
 
 2. For each additional tool, run:
    ```gcode
-   CAL_02_PREP_TOOL_CAL TOOL=1
+   CAL_TWO_PREP_TOOL_CAL TOOL=1
    ```
    The macro picks up the tool and moves it to the camera position. Re-centre the nozzle in the crosshair using the jog controls, then run:
    ```gcode
-   CAL_03_SAVE_XY_OFFSET
+   CAL_THREE_SAVE_XY_OFFSET
    ```
    The offset is calculated and saved automatically. Repeat for every additional tool.
 
@@ -1380,9 +1514,22 @@ Regardless of which XY method you use, Z offsets are set automatically using the
 CAL_Z
 ```
 
+By default, calibration is performed cold, preserving the existing behaviour. To
+measure offsets with every nozzle at the same temperature, pass a nozzle target and
+an optional soak time:
+
+```gcode
+CAL_Z NOZZLE_TEMP=150 SOAK=10
+```
+
+Each tool is heated only after pickup, held at the target for the requested soak,
+then measured. The heater is switched off before that tool is parked. The bed heater
+is not controlled by `CAL_Z`.
+
 Prerequisites:
 - Printer homed (homes automatically if not)
 - **No filament available to the extruder gears in any tool** — if filament is loaded, latch engage moves during pickup can spike load-cell readings and cause calibration to fail.
+- When using `NOZZLE_TEMP`, make sure the nozzle tips are clean. Any softened filament on a nozzle can affect the load-cell measurement.
 
 Per tool, the macro:
 1. Picks up the tool
@@ -1505,6 +1652,8 @@ T1  ; pick up tool 1
 T2  ; pick up tool 2
 ```
 
+Mainsail and Fluidd show these macros as tool buttons and mark the tool INDX has on the head. If you have more tools than `T0` to `T3`, add `variable_active: False` to each extra `T<n>` macro in `indx.cfg`, like the four that ship with it. A `T<n>` macro without that line still changes tools but does not show as active.
+
 > ⚠️ **Never remove a tool while the nozzle is heating.** If a tool is physically removed from the Smart Head while the induction coil is active, the firmware on the Bondtech INDX PCB will crash. You will need to run `FIRMWARE_RESTART` in the Klipper console before the printer can be used again.
 
 **Priming before a print**
@@ -1532,11 +1681,17 @@ Common slicers used with INDX include PrusaSlicer, OrcaSlicer, SuperSlicer, and 
 
   Add under Printer Settings → Machine G-code → Change filament G-code:
   ```gcode
-  CHANGE_TOOL TOOL={next_extruder} TEMP={nozzle_temperature[next_extruder]}
+  CHANGE_TOOL TOOL={next_extruder} TEMP={new_filament_temp}
   M400
   ```
 
   `TEMP=` tells the toolchange what the incoming tool should heat to. Without it the macro can only fall back to the outgoing tool's temperature, which is correct when both tools print at the same temperature and wrong when they don't: the new tool gets brought to the old filament's temperature and only corrected afterwards. Passing it heats each tool to its own temperature once, with no overshoot and no second wait.
+
+  `new_filament_temp` is a plain value OrcaSlicer computes for the incoming filament rather than an array you index yourself, and it is first-layer aware: the first layer temperature on layer one, the other-layers temperature after that. Earlier versions of this README used `nozzle_temperature[next_extruder]`. Either form works for an ordinary toolchange, but the scalar is harder to get wrong.
+
+  > ⚠️ **If your toolchanges heat to the filament's maximum temperature**, the snippet is not the cause and changing it will not help. Check **Enable tower interface features** in Print Settings. When it is on, OrcaSlicer deliberately overrides the incoming filament's temperature on prime tower interface layers, where two materials meet, to that filament's **Interface layer print temperature**. That setting defaults to `-1`, and OrcaSlicer's own tooltip for it reads "If set to -1, use max recommended nozzle temperature". So every interface-layer toolchange heats to the filament's max, by design.
+  >
+  > Fix it at the source: either give **Interface layer print temperature** a real value on each filament, or turn **Enable tower interface features** back off. It is off by default, so if you have not touched it this does not apply to you. The override is applied after the placeholder is filled in, so no change to the G-code above can avoid it.
 
   **PrusaSlicer / SuperSlicer**
 
@@ -1610,13 +1765,19 @@ Bondtech's sold docks use SLS-printed Nylon 12 GF. For self-printed docks, use a
 
 **Community designs**
 
-Community dock designs for specific printers and frames will be collected on [github.com/BondtechAB/INDX](https://github.com/BondtechAB/INDX). If you design a dock for an unlisted setup, submit it via pull request.
+Community dock designs for specific printers and frames are collected in [`community/`](community/). The [2020 extrusion dock](community/1_printer_agnostic/2020-dock/) there is a good worked example of adapting the reference geometry: it keeps the same hardware and the same dimensions on every other axis, and only the body changed. If you design a dock for an unlisted setup, submit it via pull request.
 
 ### Part Cooling
 
-INDX's modular part cooling system is designed to be extended by the community. The cooling solution snaps onto the outside of the Smart Head cowlings; the interface geometry is defined in the cowling CAD files, which Bondtech will publish on [github.com/BondtechAB/INDX](https://github.com/BondtechAB/INDX).
+INDX's modular part cooling system is designed to be extended by the community. The cooling solution snaps onto the outside of the Smart Head cowlings, and the interface geometry is published, so you have everything you need to design against it.
 
-If you design a custom part cooling solution using the cowling CAD files as a reference, we'd love to see it. Community-contributed cooling designs will be collected in the GitHub repository. Submit yours via pull request.
+What a shroud actually attaches to is the fan shroud clip, [`INDX_Part_Cooling_Interface_left.stl`](CAD/STL/INDX_Part_Cooling_Interface_left.stl) and [`INDX_Part_Cooling_Interface_right.stl`](CAD/STL/INDX_Part_Cooling_Interface_right.stl). The cowlings those clip to are [`INDX_Front_cover_left.stl`](CAD/STL/INDX_Front_cover_left.stl) and [`INDX_Front_cover_right.stl`](CAD/STL/INDX_Front_cover_right.stl). All of it is in the reference STEP model as well, which is the better starting point for CAD work. See [CAD Files & Templates](#cad-files--templates).
+
+Bondtech's own ducts are in the repository too and are worth reading as worked examples of the same interface: the dual 40×10 blower ducts and the CPAP ducts, including its top manifold.
+
+Two constraints to design within. Minimum tool centre-to-centre spacing goes from 34 mm bare to **41 mm** with the Bondtech cooling solutions fitted, so anything wider than those eats into dock spacing. And the tools cool passively while docked, so a shroud that blocks airflow around a parked tool works against the system rather than with it.
+
+If you design a custom part cooling solution, we'd love to see it. Community-contributed cooling designs are welcome in [`community/`](community/); submit yours via pull request.
 
 ### CAD Files & Templates
 
@@ -1628,11 +1789,18 @@ The STEP file is the master reference model; it contains the geometry of every p
 
 | File | Format | Description |
 | ---- | ------ | ----------- |
-| [`INDX_simplified_1.17.step`](CAD/INDX_simplified_1.17.step) | STEP | Simplified reference model of the full INDX assembly, includes all printable parts below |
+| [`INDX_simplified_1.19.step`](CAD/INDX_simplified_1.19.step) | STEP | Simplified reference model of the full INDX assembly. Includes the open nozzle front, so you can modify it and print your own |
+| [`INDX_Link_simplified_1.0.step`](CAD/INDX_Link_simplified_1.0.step) | STEP | Simplified reference model of the Link Board, for designing a mount or enclosure for it |
 
 **Printable parts (STL)**
 
 These are print-ready STLs of the individual parts. They are all derived from the reference STEP above.
+
+**Which Tool Dock body to print.** The dock body comes in two variants because the two 15×15 profiles do not take the same fastener: MakerBeam XL has an indexing track running down the slot that a standard 1515 T-nut will not clear.
+
+Print the **standard extrusion** body unless you have a reason not to. It suits both standard 1515 and MakerBeam XL, so it is the easier all-round choice and it keeps the dock usable if you ever move it to a different frame. The **MakerBeam XL** body is the original, and it is the geometry Bondtech's ready-made docks use; it mounts on standard 1515 as well, given a fastener that suits. Print one or the other, not both. The spring lid and magnet holder are the same either way.
+
+See [Mount the Dock](#2-mount-the-dock) for what the dock mounts to.
 
 | File | Part | Description |
 | ---- | ---- | ----------- |
@@ -1648,11 +1816,15 @@ These are print-ready STLs of the individual parts. They are all derived from th
 | [`INDX_CPAP_Duct_Right.stl`](CAD/STL/INDX_CPAP_Duct_Right.stl) | Part cooling (CPAP) | CPAP duct, right half |
 | [`INDX_CPAP_Duct_Top.stl`](CAD/STL/INDX_CPAP_Duct_Top.stl) | Part cooling (CPAP) | CPAP duct, top manifold |
 | [`INDX_Beacon_Cartographer_Mount.stl`](CAD/STL/INDX_Beacon_Cartographer_Mount.stl) | Probe mount | Mount for a Beacon / Cartographer scanning probe |
+| [`INDX Tool Dock 1515 Standard extrusion.stl`](CAD/STL/INDX%20Tool%20Dock%201515%20Standard%20extrusion.stl) | Tool Dock body | Dock main body, one per dock. Suits standard 1515 **and** MakerBeam XL; print this one unless you have a reason not to |
+| [`INDX Tool Dock 1515 MakerbeamXL.stl`](CAD/STL/INDX%20Tool%20Dock%201515%20MakerbeamXL.stl) | Tool Dock body | Dock main body, one per dock. Matches Bondtech's ready-made docks. Mounts on standard 1515 too; see the fastener note in [Mount the Dock](#2-mount-the-dock) |
+| [`INDX Tool Dock 1515 Spring lid.stl`](CAD/STL/INDX%20Tool%20Dock%201515%20Spring%20lid.stl) | Tool Dock part | Spring lid, common to both dock bodies |
+| [`INDX Tool Dock 1515 Magnet holder.STL`](CAD/STL/INDX%20Tool%20Dock%201515%20Magnet%20holder.STL) | Tool Dock part | Magnet holder slider, common to both dock bodies |
 | [`INDX_Dock_calibration_tool.stl`](CAD/STL/INDX_Dock_calibration_tool.stl) | Dock calibration tool | Printed jig for calibrating dock position during initial setup; see [Dock Position Calibration](#dock-position-calibration) |
 
 The repository is licensed under **GPL-3.0**.
 
-More files (dock templates, additional X-carriage adapters, tool body templates) will be added as the project develops. Community contributions are welcome via pull request.
+More files (additional X-carriage adapters, tool body templates) will be added as the project develops. Community contributions are welcome via pull request.
 
 ---
 
@@ -1763,6 +1935,34 @@ Visually inspect the Smart Head for any obvious physical damage: bent parts, bro
 
 If hardware damage is confirmed or suspected, contact Bondtech support at [bondtech.se/contact](https://www.bondtech.se/contact/) before continuing to use the system. Running with a damaged DX extruder can cause print failures and may cause further damage.
 
+### INDX has the wrong idea of which tool is loaded
+
+After a power cut mid-toolchange, a crash, or a tool that was pulled off by hand, the saved state can disagree with reality: INDX believes a tool is locked when the head is empty, or believes it is empty when a tool is still in. Symptoms are a tool change that refuses to run, a `G28 Z` that errors on the load-cell seat check, or `TOOL_STATUS` showing a tool you know is not there.
+
+Two macros exist to get out of it. Both are deliberately blunt, so read what they do before running either.
+
+```gcode
+MANUAL_TOOL_REMOVE
+```
+
+Opens the latch so you can take the tool off by hand, then records the head as open and empty. **The tool is released the moment the latch opens**, so support it with your hand first or it will drop. Use this when a tool is physically in the head and you want it out.
+
+```gcode
+MANUAL_TOOLHEAD_RESET
+```
+
+Records the head as open and empty without touching the latch. Use this when the head is *already* empty and only the saved state is wrong. It changes what INDX believes, not what the hardware is doing, so running it while a tool is still locked in leaves the two further apart than before.
+
+The opposite case, a tool on the head that INDX does not know about (you put it there by hand, or the saved state says empty):
+
+```gcode
+MANUAL_TOOL_SEAT TOOL=n
+```
+
+Locks the latch onto the tool and records it as tool `n`. Hold the tool in place on the Smart Head while it locks. This is also how the first tool gets on before the docks are measured, and how T0 gets on before the first `G28`.
+
+After any of these, pick a tool up normally with `Tn` or `CHANGE_TOOL` and the state will be correct again from there. If the latch itself will not move, stop and see [DX extruder not opening or closing correctly after a crash](#dx-extruder-not-opening-or-closing-correctly-after-a-crash) rather than forcing it.
+
 ### `indxmcu` not connecting
 
 If Klipper reports a timeout or cannot find `indxmcu` on startup, work through these causes:
@@ -1827,7 +2027,7 @@ After rebooting, run `ls /dev/serial/by-id/` to confirm the Link Board is now vi
 
 If the Smart Head slams into the dock or the docked tools when you run `G28`, the most likely cause is that the homing order has not been configured. By default, Klipper homes X before Y; if the Smart Head is near the dock when homing starts, a full-speed X move can send it directly into the dock.
 
-Add a `[homing_override]` section to your `printer.cfg` that homes Y before X. See [Homing order](#homing-order-important) for the recommended config. After any crash, re-home the printer before moving on; the stepper motors may have lost steps, making the position shown in your interface unreliable.
+Include `homing.cfg` (or merge its `[homing_override]` into yours) so Y homes before X. See [Homing order](#homing-order-important). After any crash, re-home the printer before moving on; the stepper motors may have lost steps, making the position shown in your interface unreliable.
 
 ### Extruder feeding filament in the wrong direction
 
